@@ -1,0 +1,24 @@
+# Binary
+/monitor
+
+# Go build artifacts
+*.exe
+*.exe~
+*.test
+*.prof
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Docker
+*.tar
+
+# OS
+.DS_Store
+
+# Local config (uncomment if needed)
+# config.yaml 

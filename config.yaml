@@ -1,0 +1,52 @@
+jobs:
+  - name: "Test HTTP Check"
+    description: "Check if a website is accessible"
+    schedule:
+        type: "frequency"
+        data:
+            daysOfWeek: [1, 1, 1, 1, 1, 1, 1]
+            intervalInSeconds: 10
+    action:
+        plugin: "bash_check"
+        script: |
+          echo "testing job"
+          if curl -s -o /dev/null -w "%{http_code}" https://httpbin.org/status/200 | grep -q "200"; then
+            res=`curl -s -o /dev/null -w "%{http_code}" https://httpbin.org/status/200`
+            echo "res " $res
+            exit 0
+          else
+            exit 1
+          fi
+    decision_logic: >
+      {
+          "if": [
+              {  
+                  "==": [{"var": "bash_check_result.exit_code"}, 0]
+              },
+              "GOOD",
+              "BAD"
+          ]
+      }
+
+  - name: "Test Strict Schedule"
+    description: "Test job with strict schedule"
+    schedule:
+        type: "strict"
+        data:
+            daysOfWeek: [1, 1, 1, 1, 1, 1, 1]
+            atUTC: ["12:00:00", "14:00:00"]
+    action:
+        plugin: "bash_check"
+        script: |
+          echo "Running at $(date)"
+          exit 0
+    decision_logic: >
+      {
+          "if": [
+              {  
+                  "==": [{"var": "bash_check_result.exit_code"}, 0]
+              },
+              "GOOD",
+              "BAD"
+          ]
+      }
