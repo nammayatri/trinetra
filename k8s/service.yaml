@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: trinetra
+  namespace: monitoring
+  labels:
+    app: trinetra
+spec:
+  selector:
+    app: trinetra
+  ports:
+    - port: 2112
+      targetPort: metrics
+      name: metrics
+  type: ClusterIP 

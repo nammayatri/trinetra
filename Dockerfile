@@ -34,6 +34,9 @@ RUN apk add --no-cache \
     gawk \
     && rm -rf /var/cache/apk/*
 
+RUN apk add --no-cache curl bash && \
+curl https://clickhouse.com/ | sh
+
 # Copy the binary from builder
 COPY --from=builder /app/monitor .
 

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trinetra
+  namespace: monitoring
+  labels:
+    app: trinetra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trinetra
+  template:
+    metadata:
+      labels:
+        app: trinetra
+    spec:
+      containers:
+      - name: trinetra
+        image: ghcr.io/nammayatri/trinetra:sha-48c4961
+        ports:
+        - containerPort: 2112
+          name: metrics
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config.yaml
+          subPath: config.yaml
+      volumes:
+      - name: config-volume
+        secret:
+          secretName: trinetra-config 
