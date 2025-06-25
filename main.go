@@ -52,7 +52,7 @@ var (
 			Name: "job_status_total",
 			Help: "Total number of job status changes",
 		},
-		[]string{"job_name", "status"},
+		[]string{"job_name", "status", "exit_code"},
 	)
 )
 
@@ -159,11 +159,11 @@ func evaluateDecisionLogic(logic interface{}, data map[string]interface{}) (stri
 func updateMetrics(jobName string, decision string, exitCode int) {
 	switch {
 	case decision == "BAD":
-		jobStatusMetric.WithLabelValues(jobName, "BAD").Inc()
+		jobStatusMetric.WithLabelValues(jobName, "BAD", fmt.Sprintf("%d", exitCode)).Inc()
 	case exitCode != 0:
-		jobStatusMetric.WithLabelValues(jobName, "ERROR").Inc()
+		jobStatusMetric.WithLabelValues(jobName, "ERROR", fmt.Sprintf("%d", exitCode)).Inc()
 	default:
-		jobStatusMetric.WithLabelValues(jobName, "OK").Inc()
+		jobStatusMetric.WithLabelValues(jobName, "OK", fmt.Sprintf("%d", exitCode)).Inc()
 	}
 }
 
@@ -173,7 +173,7 @@ func runJob(job Job) {
 	exitCode, err := executeBashScript(job.Action.Script)
 	if err != nil {
 		log.Printf("Error executing script for job %s: %v", job.Name, err)
-		jobStatusMetric.WithLabelValues(job.Name, "ERROR").Inc()
+		jobStatusMetric.WithLabelValues(job.Name, "ERROR", fmt.Sprintf("%d", exitCode)).Inc()
 		return
 	}
 	log.Printf("Script for job %s finished with exit code: %d", job.Name, exitCode)
@@ -187,7 +187,7 @@ func runJob(job Job) {
 	decision, err := evaluateDecisionLogic(job.DecisionLogic, data)
 	if err != nil {
 		log.Printf("Error evaluating decision logic for job %s: %v", job.Name, err)
-		jobStatusMetric.WithLabelValues(job.Name, "ERROR").Inc()
+		jobStatusMetric.WithLabelValues(job.Name, "ERROR", fmt.Sprintf("%d", exitCode)).Inc()
 		return
 	}
 	log.Printf("Decision logic for job %s returned: %s", job.Name, decision)
