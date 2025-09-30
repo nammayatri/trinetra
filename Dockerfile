@@ -32,6 +32,7 @@ RUN apk add --no-cache \
     procps \
     findutils \
     gawk \
+    postgresql-client \
     && rm -rf /var/cache/apk/*
 
 RUN apk add --no-cache curl bash && \
